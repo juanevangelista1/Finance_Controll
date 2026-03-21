@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -f \"c:\\\\Users\\\\juane\\\\OneDrive\\\\Área de Trabalho\\\\Estudos\\\\Projetos\\\\Dt-money\\\\Projeto-Finance-Controll\\\\Dt-Money\\\\vite.config.ts\")",
+      "Bash(rm -f \"c:\\\\Users\\\\juane\\\\OneDrive\\\\Área de Trabalho\\\\Estudos\\\\Projetos\\\\Dt-money\\\\Projeto-Finance-Controll\\\\Dt-Money\\\\index.html\")",
+      "Bash(rm -f \"c:\\\\Users\\\\juane\\\\OneDrive\\\\Área de Trabalho\\\\Estudos\\\\Projetos\\\\Dt-money\\\\Projeto-Finance-Controll\\\\Dt-Money\\\\tsconfig.node.json\")",
+      "Bash(rm -f \"c:\\\\Users\\\\juane\\\\OneDrive\\\\Área de Trabalho\\\\Estudos\\\\Projetos\\\\Dt-money\\\\Projeto-Finance-Controll\\\\Dt-Money\\\\server.json\")",
+      "Bash(rm -f \"c:\\\\Users\\\\juane\\\\OneDrive\\\\Área de Trabalho\\\\Estudos\\\\Projetos\\\\Dt-money\\\\Projeto-Finance-Controll\\\\Dt-Money\\\\eslintrc.json\")",
+      "Bash(rm -rf \"c:\\\\Users\\\\juane\\\\OneDrive\\\\Área de Trabalho\\\\Estudos\\\\Projetos\\\\Dt-money\\\\Projeto-Finance-Controll\\\\Dt-Money\\\\src\")",
+      "Bash(npm install)",
+      "Bash(node -e \"const pkg = require\\(''./package.json''\\); console.log\\(''react:'', pkg.dependencies.react\\); console.log\\(''next:'', pkg.dependencies.next\\);\")",
+      "Bash(npx next build)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npm run build)"
+    ]
+  }
+}
