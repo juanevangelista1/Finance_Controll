@@ -41,7 +41,7 @@ export function MonthYearFilter() {
               key={year}
               onClick={() => setFilter({ year })}
               className={cn(
-                'rounded-lg px-3 py-1 text-sm font-medium transition-colors',
+                'cursor-pointer rounded-lg px-3 py-1 text-sm font-medium transition-colors',
                 currentYear === year
                   ? 'bg-dt-purple text-white'
                   : 'text-dt-muted hover:text-white hover:bg-white/5',
@@ -70,7 +70,7 @@ export function MonthYearFilter() {
               key={month}
               onClick={() => setFilter({ month: index })}
               className={cn(
-                'flex-shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all',
+                'cursor-pointer flex-shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all',
                 currentMonth === index
                   ? 'bg-dt-purple text-white shadow-md shadow-dt-purple/30 scale-105'
                   : 'text-dt-muted hover:text-white hover:bg-white/5',

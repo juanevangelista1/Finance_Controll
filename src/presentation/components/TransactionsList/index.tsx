@@ -35,13 +35,13 @@ function DeleteConfirmModal({
           <div className="flex gap-3">
             <button
               onClick={onCancel}
-              className="flex-1 rounded-xl border border-dt-border py-2.5 text-sm font-semibold text-dt-muted hover:text-white hover:bg-white/5 transition-colors"
+              className="flex-1 cursor-pointer rounded-xl border border-dt-border py-2.5 text-sm font-semibold text-dt-muted hover:text-white hover:bg-white/5 transition-colors"
             >
               Cancelar
             </button>
             <button
               onClick={onConfirm}
-              className="flex-1 rounded-xl bg-dt-red py-2.5 text-sm font-bold text-white shadow-lg shadow-dt-red/25 hover:bg-dt-red-dark transition-colors active:scale-95"
+              className="flex-1 cursor-pointer rounded-xl bg-dt-red py-2.5 text-sm font-bold text-white shadow-lg shadow-dt-red/25 hover:bg-dt-red-dark transition-colors active:scale-95"
             >
               Remover
             </button>
@@ -92,7 +92,7 @@ export function TransactionsList() {
               </div>
               <button
                 onClick={() => setDeleteTarget({ id: transaction.id, description: transaction.description })}
-                className="p-1.5 rounded-lg text-dt-muted hover:text-dt-red hover:bg-dt-red/10 transition-colors flex-shrink-0"
+                className="cursor-pointer p-1.5 rounded-lg text-dt-muted hover:text-dt-red hover:bg-dt-red/10 transition-colors flex-shrink-0"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -174,7 +174,7 @@ export function TransactionsList() {
                 <td className="px-6 py-4">
                   <button
                     onClick={() => setDeleteTarget({ id: transaction.id, description: transaction.description })}
-                    className="rounded-lg p-2 text-dt-muted opacity-0 group-hover:opacity-100 hover:text-dt-red hover:bg-dt-red/10 transition-all"
+                    className="cursor-pointer rounded-lg p-2 text-dt-muted opacity-0 group-hover:opacity-100 hover:text-dt-red hover:bg-dt-red/10 transition-all"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>

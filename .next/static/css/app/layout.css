@@ -502,6 +502,9 @@ video {
 [hidden]:where(:not([hidden="until-found"])) {
   display: none;
 }
+.pointer-events-none {
+  pointer-events: none;
+}
 .fixed {
   position: fixed;
 }
@@ -531,6 +534,9 @@ video {
 }
 .top-1\/2 {
   top: 50%;
+}
+.left-3\.5 {
+  left: 0.875rem;
 }
 .z-40 {
   z-index: 40;
@@ -642,6 +648,9 @@ video {
 .max-h-64 {
   max-height: 16rem;
 }
+.max-h-\[90dvh\] {
+  max-height: 90dvh;
+}
 .min-h-screen {
   min-height: 100vh;
 }
@@ -739,6 +748,9 @@ video {
 }
 .animate-slide-up {
   animation: slideUp 0.3s ease-out;
+}
+.cursor-pointer {
+  cursor: pointer;
 }
 .appearance-none {
   -webkit-appearance: none;
@@ -1023,6 +1035,9 @@ video {
 .pt-2 {
   padding-top: 0.5rem;
 }
+.pr-4 {
+  padding-right: 1rem;
+}
 .text-left {
   text-align: left;
 }
@@ -1175,6 +1190,9 @@ video {
 }
 .duration-500 {
   transition-duration: 500ms;
+}
+.\[color-scheme\:dark\] {
+  color-scheme: dark;
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -1383,6 +1401,10 @@ body {
 
   .sm\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sm\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .sm\:flex-row {

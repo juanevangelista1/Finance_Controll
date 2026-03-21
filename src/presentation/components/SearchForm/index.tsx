@@ -44,7 +44,7 @@ export function SearchForm() {
           <button
             type="button"
             onClick={clearSearch}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-dt-muted hover:text-white transition-colors"
+            className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-dt-muted hover:text-white transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
@@ -52,7 +52,7 @@ export function SearchForm() {
       </div>
       <button
         type="submit"
-        className="flex items-center gap-2 rounded-xl bg-dt-purple px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-dt-purple/25 transition-all hover:bg-dt-purple-dark active:scale-95"
+        className="flex cursor-pointer items-center gap-2 rounded-xl bg-dt-purple px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-dt-purple/25 transition-all hover:bg-dt-purple-dark active:scale-95"
       >
         <Search className="h-4 w-4" />
         <span className="hidden sm:inline">Buscar</span>

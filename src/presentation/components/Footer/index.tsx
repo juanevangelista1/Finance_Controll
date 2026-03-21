@@ -22,7 +22,7 @@ export function Footer() {
               href="https://www.linkedin.com/in/juan-evangelista/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-semibold text-dt-purple-light hover:text-white transition-colors group"
+              className="inline-flex cursor-pointer items-center gap-1 font-semibold text-dt-purple-light hover:text-white transition-colors group"
             >
               Juan Evangelista
               <Linkedin className="h-3.5 w-3.5 transition-transform group-hover:scale-110" />

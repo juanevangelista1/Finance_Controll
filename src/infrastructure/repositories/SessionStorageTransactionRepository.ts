@@ -31,13 +31,16 @@ export class SessionStorageTransactionRepository implements ITransactionReposito
 
   create(data: CreateTransactionDTO): Transaction {
     const transactions = this.getAll()
+    // Parse the date as local noon to avoid UTC offset crossing month boundary
+    const [y, m, d] = data.date.split('-').map(Number)
+    const localDate = new Date(y, m - 1, d, 12, 0, 0)
     const newTransaction: Transaction = {
       id: generateId(),
       description: data.description,
       type: data.type,
       amount: data.amount,
       category: data.category,
-      createdAt: new Date().toISOString(),
+      createdAt: localDate.toISOString(),
     }
     this.persist([...transactions, newTransaction])
     return newTransaction
