@@ -156,13 +156,28 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
                 <label className="mb-1.5 block text-sm font-medium text-dt-muted">
                   Valor (R$)
                 </label>
-                <input
-                  {...register('amount')}
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="0,00"
-                  className="h-11 w-full rounded-xl border border-dt-border bg-dt-card px-4 text-sm text-white placeholder:text-dt-muted/60 focus:border-dt-purple/60 focus:outline-none focus:ring-2 focus:ring-dt-purple/20 transition-all"
+                <Controller
+                  control={control}
+                  name="amount"
+                  render={({ field }) => {
+                    const numVal = typeof field.value === 'number' ? field.value : 0
+                    const displayValue = numVal > 0
+                      ? numVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                      : ''
+                    return (
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={displayValue}
+                        onChange={(e) => {
+                          const digits = e.target.value.replace(/\D/g, '')
+                          field.onChange(digits ? parseInt(digits, 10) / 100 : 0)
+                        }}
+                        placeholder="0,00"
+                        className="h-11 w-full rounded-xl border border-dt-border bg-dt-card px-4 text-sm text-white placeholder:text-dt-muted/60 focus:border-dt-purple/60 focus:outline-none focus:ring-2 focus:ring-dt-purple/20 transition-all"
+                      />
+                    )
+                  }}
                 />
                 {errors.amount && (
                   <p className="mt-1 text-xs text-dt-red">{errors.amount.message}</p>
