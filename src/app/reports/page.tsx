@@ -9,7 +9,7 @@ import { MonthlyBarChart } from '../../presentation/components/Charts/MonthlyBar
 import { CategoryPieChart } from '../../presentation/components/Charts/CategoryPieChart'
 import { BalanceLineChart } from '../../presentation/components/Charts/BalanceLineChart'
 import { formatCurrency, getYearRange } from '../../shared/utils/formatter'
-import { SessionStorageTransactionRepository } from '../../infrastructure/repositories/SessionStorageTransactionRepository'
+import { LocalStorageTransactionRepository } from '../../infrastructure/repositories/SessionStorageTransactionRepository'
 import { GetTransactionsUseCase } from '../../application/transaction/use-cases/GetTransactionsUseCase'
 import { exportToPDF } from '../../shared/utils/pdfExport'
 import { cn } from '../../shared/utils/cn'
@@ -20,9 +20,9 @@ export default function ReportsPage() {
   const [selectedYear, setSelectedYear] = useState(filter.year ?? new Date().getFullYear())
   const [exporting, setExporting] = useState(false)
 
-  // Re-reads from SessionStorage whenever selectedYear or contextTransactions change
+  // Re-reads from LocalStorage whenever selectedYear or contextTransactions change
   const allYearTransactions = useMemo(() => {
-    const repository = new SessionStorageTransactionRepository()
+    const repository = new LocalStorageTransactionRepository()
     const getAll = new GetTransactionsUseCase(repository)
     return getAll.executeAllMonths(selectedYear)
   // contextTransactions is used as a reactive trigger for when transactions are added/deleted

@@ -13,7 +13,7 @@ import type {
   CreateTransactionDTO,
   TransactionFilterDTO,
 } from '../../application/transaction/dtos/TransactionDTO'
-import { SessionStorageTransactionRepository } from '../../infrastructure/repositories/SessionStorageTransactionRepository'
+import { LocalStorageTransactionRepository } from '../../infrastructure/repositories/SessionStorageTransactionRepository'
 import { CreateTransactionUseCase } from '../../application/transaction/use-cases/CreateTransactionUseCase'
 import { GetTransactionsUseCase } from '../../application/transaction/use-cases/GetTransactionsUseCase'
 import { DeleteTransactionUseCase } from '../../application/transaction/use-cases/DeleteTransactionUseCase'
@@ -57,7 +57,7 @@ interface TransactionsContextValue {
 const TransactionsContext = createContext<TransactionsContextValue | null>(null)
 
 // --- Repository & Use Cases (singleton) ---
-const repository = new SessionStorageTransactionRepository()
+const repository = new LocalStorageTransactionRepository()
 const createUseCase = new CreateTransactionUseCase(repository)
 const getUseCase = new GetTransactionsUseCase(repository)
 const deleteUseCase = new DeleteTransactionUseCase(repository)

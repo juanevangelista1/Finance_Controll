@@ -8,17 +8,17 @@ function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
 }
 
-export class SessionStorageTransactionRepository implements ITransactionRepository {
+export class LocalStorageTransactionRepository implements ITransactionRepository {
   private getAll(): Transaction[] {
     if (typeof window === 'undefined') return []
-    const stored = sessionStorage.getItem(STORAGE_KEY)
+    const stored = localStorage.getItem(STORAGE_KEY)
     if (!stored) return []
     return JSON.parse(stored) as Transaction[]
   }
 
   private persist(transactions: Transaction[]): void {
     if (typeof window === 'undefined') return
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(transactions))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions))
   }
 
   findAll(): Transaction[] {
@@ -53,7 +53,7 @@ export class SessionStorageTransactionRepository implements ITransactionReposito
 
   clear(): void {
     if (typeof window !== 'undefined') {
-      sessionStorage.removeItem(STORAGE_KEY)
+      localStorage.removeItem(STORAGE_KEY)
     }
   }
 }
