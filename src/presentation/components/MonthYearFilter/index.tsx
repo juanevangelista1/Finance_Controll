@@ -32,7 +32,6 @@ export function MonthYearFilter() {
 
   return (
     <div className="rounded-xl border border-dt-border bg-dt-card p-4">
-      {/* Year Selector */}
       <div className="mb-3 flex items-center gap-2">
         <span className="text-xs font-medium text-dt-muted uppercase tracking-wider">Ano</span>
         <div className="flex gap-1">
@@ -52,8 +51,6 @@ export function MonthYearFilter() {
           ))}
         </div>
       </div>
-
-      {/* Month Selector */}
       <div className="flex items-center gap-2">
         <button
           onClick={prevMonth}

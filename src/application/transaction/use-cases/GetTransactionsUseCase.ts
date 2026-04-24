@@ -13,7 +13,9 @@ export class GetTransactionsUseCase {
       transactions = transactions.filter(
         (t) =>
           t.description.toLowerCase().includes(query) ||
-          t.category.toLowerCase().includes(query),
+          t.category.toLowerCase().includes(query) ||
+          (t.subcategory && t.subcategory.toLowerCase().includes(query)) ||
+          (t.tags && t.tags.some((tag) => tag.toLowerCase().includes(query))),
       )
     }
 
@@ -27,6 +29,20 @@ export class GetTransactionsUseCase {
         const date = new Date(t.createdAt)
         return date.getFullYear() === filter.year
       })
+    }
+
+    if (filter?.category) {
+      transactions = transactions.filter((t) => t.category === filter.category)
+    }
+
+    if (filter?.subcategory) {
+      transactions = transactions.filter((t) => t.subcategory === filter.subcategory)
+    }
+
+    if (filter?.tag) {
+      transactions = transactions.filter(
+        (t) => t.tags && t.tags.includes(filter.tag!),
+      )
     }
 
     return transactions.sort(

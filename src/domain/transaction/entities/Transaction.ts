@@ -4,5 +4,8 @@ export interface Transaction {
   type: 'income' | 'outcome'
   amount: number
   category: string
+  subcategory?: string
+  tags?: string[]
+  notes?: string
   createdAt: string
 }

@@ -8,12 +8,31 @@ function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
 }
 
+/**
+ * Migrates legacy transactions (without new fields) to the current schema.
+ * Ensures backward compatibility when new fields are added.
+ */
+function migrateTransaction(raw: Record<string, unknown>): Transaction {
+  return {
+    id: raw.id as string,
+    description: raw.description as string,
+    type: raw.type as 'income' | 'outcome',
+    amount: raw.amount as number,
+    category: raw.category as string,
+    subcategory: (raw.subcategory as string) ?? undefined,
+    tags: Array.isArray(raw.tags) ? (raw.tags as string[]) : [],
+    notes: (raw.notes as string) ?? undefined,
+    createdAt: raw.createdAt as string,
+  }
+}
+
 export class LocalStorageTransactionRepository implements ITransactionRepository {
   private getAll(): Transaction[] {
     if (typeof window === 'undefined') return []
     const stored = localStorage.getItem(STORAGE_KEY)
     if (!stored) return []
-    return JSON.parse(stored) as Transaction[]
+    const parsed = JSON.parse(stored) as Record<string, unknown>[]
+    return parsed.map(migrateTransaction)
   }
 
   private persist(transactions: Transaction[]): void {
@@ -40,6 +59,9 @@ export class LocalStorageTransactionRepository implements ITransactionRepository
       type: data.type,
       amount: data.amount,
       category: data.category,
+      subcategory: data.subcategory,
+      tags: data.tags ?? [],
+      notes: data.notes,
       createdAt: localDate.toISOString(),
     }
     this.persist([...transactions, newTransaction])
