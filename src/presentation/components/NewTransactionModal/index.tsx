@@ -1,32 +1,31 @@
 'use client'
 
+import { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import * as Dialog from '@radix-ui/react-dialog'
-import { ArrowUpCircle, ArrowDownCircle, X, CalendarDays } from 'lucide-react'
+import { ArrowUpCircle, ArrowDownCircle, X, CalendarDays, ChevronDown, StickyNote } from 'lucide-react'
 import { useTransactionsContext } from '../../contexts/TransactionsContext'
 import { cn } from '../../../shared/utils/cn'
+import { SmartTagInput } from '../SmartTagInput'
+import {
+  getCategoryRegistry,
+  findCategory,
+  type CategoryDefinition,
+} from '../../../domain/transaction/value-objects/CategoryRegistry'
 
 const schema = z.object({
   description: z.string().min(1, 'Descrição obrigatória'),
   amount: z.coerce.number().positive('Valor deve ser positivo'),
   category: z.string().min(1, 'Categoria obrigatória'),
+  subcategory: z.string().optional(),
   type: z.enum(['income', 'outcome']),
   date: z.string().min(1, 'Data obrigatória'),
+  notes: z.string().optional(),
 })
 
 type FormData = z.infer<typeof schema>
-
-const INCOME_CATEGORIES = [
-  'Plantão', 'SAMU', 'AeroMédico', 'Salário',
-  'Freelance', 'Investimentos', 'Outros',
-]
-
-const OUTCOME_CATEGORIES = [
-  'Alimentação', 'Moradia', 'Transporte', 'Saúde', 'Educação',
-  'Lazer', 'Assinaturas', 'Outros',
-]
 
 function todayISO(): string {
   const now = new Date()
@@ -43,6 +42,9 @@ interface Props {
 
 export function NewTransactionModal({ open, onOpenChange }: Props) {
   const { createTransaction } = useTransactionsContext()
+  const [tags, setTags] = useState<string[]>([])
+  const [showNotes, setShowNotes] = useState(false)
+
   const {
     register,
     handleSubmit,
@@ -57,16 +59,31 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
   })
 
   const currentType = watch('type')
-  const categories = currentType === 'income' ? INCOME_CATEGORIES : OUTCOME_CATEGORIES
+  const currentCategory = watch('category')
+
+  const categoryRegistry = getCategoryRegistry(currentType)
+  const selectedCategoryDef: CategoryDefinition | undefined = findCategory(currentType, currentCategory)
+  const subcategories = selectedCategoryDef?.subcategories ?? []
 
   function onSubmit(data: FormData) {
-    createTransaction(data)
-    reset({ type: 'income', date: todayISO() })
+    createTransaction({
+      ...data,
+      subcategory: data.subcategory || undefined,
+      tags: tags.length > 0 ? tags : undefined,
+      notes: data.notes || undefined,
+    })
+    resetForm()
     onOpenChange(false)
   }
 
-  function handleClose() {
+  function resetForm() {
     reset({ type: 'income', date: todayISO() })
+    setTags([])
+    setShowNotes(false)
+  }
+
+  function handleClose() {
+    resetForm()
     onOpenChange(false)
   }
 
@@ -103,6 +120,7 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
                       onClick={() => {
                         field.onChange('income')
                         setValue('category', '')
+                        setValue('subcategory', '')
                       }}
                       className={cn(
                         'cursor-pointer flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-semibold transition-all',
@@ -119,6 +137,7 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
                       onClick={() => {
                         field.onChange('outcome')
                         setValue('category', '')
+                        setValue('subcategory', '')
                       }}
                       className={cn(
                         'cursor-pointer flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-semibold transition-all',
@@ -142,7 +161,7 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
               </label>
               <input
                 {...register('description')}
-                placeholder="Ex: Plantão 12h, Aluguel..."
+                placeholder="Ex: Ração Golden 15kg, Aluguel, Plantão 12h..."
                 className="h-11 w-full rounded-xl border border-dt-border bg-dt-card px-4 text-sm text-white placeholder:text-dt-muted/60 focus:border-dt-purple/60 focus:outline-none focus:ring-2 focus:ring-dt-purple/20 transition-all"
               />
               {errors.description && (
@@ -202,24 +221,87 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
               </div>
             </div>
 
-            {/* Category — reativa ao tipo */}
+            {/* Category — seletor com ícones */}
             <div>
               <label className="mb-1.5 block text-sm font-medium text-dt-muted">
                 {currentType === 'income' ? 'Origem' : 'Categoria'}
               </label>
-              <select
-                {...register('category')}
-                className="h-11 w-full cursor-pointer rounded-xl border border-dt-border bg-dt-card px-4 text-sm text-white focus:border-dt-purple/60 focus:outline-none focus:ring-2 focus:ring-dt-purple/20 transition-all appearance-none"
-              >
-                <option value="" className="bg-dt-surface">
-                  {currentType === 'income' ? 'Selecione a origem' : 'Selecione a categoria'}
-                </option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat} className="bg-dt-surface">{cat}</option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  {...register('category', {
+                    onChange: () => setValue('subcategory', ''),
+                  })}
+                  className="h-11 w-full cursor-pointer rounded-xl border border-dt-border bg-dt-card px-4 pr-10 text-sm text-white focus:border-dt-purple/60 focus:outline-none focus:ring-2 focus:ring-dt-purple/20 transition-all appearance-none"
+                >
+                  <option value="" className="bg-dt-surface">
+                    {currentType === 'income' ? 'Selecione a origem' : 'Selecione a categoria'}
+                  </option>
+                  {categoryRegistry.map((cat) => (
+                    <option key={cat.value} value={cat.value} className="bg-dt-surface">
+                      {cat.icon} {cat.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-dt-muted" />
+              </div>
               {errors.category && (
                 <p className="mt-1 text-xs text-dt-red">{errors.category.message}</p>
+              )}
+            </div>
+
+            {/* Subcategory — aparece só quando a categoria tem subcategorias */}
+            {subcategories.length > 0 && (
+              <div className="animate-fade-in">
+                <label className="mb-1.5 block text-sm font-medium text-dt-muted">
+                  Detalhamento
+                </label>
+                <div className="relative">
+                  <select
+                    {...register('subcategory')}
+                    className="h-11 w-full cursor-pointer rounded-xl border border-dt-border bg-dt-card px-4 pr-10 text-sm text-white focus:border-dt-purple/60 focus:outline-none focus:ring-2 focus:ring-dt-purple/20 transition-all appearance-none"
+                  >
+                    <option value="" className="bg-dt-surface">
+                      Selecione o detalhamento (opcional)
+                    </option>
+                    {subcategories.map((sub) => (
+                      <option key={sub.value} value={sub.value} className="bg-dt-surface">
+                        {sub.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-dt-muted" />
+                </div>
+              </div>
+            )}
+
+            {/* Tags */}
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-dt-muted">
+                Tags (opcional)
+              </label>
+              <SmartTagInput
+                tags={tags}
+                onChange={setTags}
+              />
+            </div>
+
+            {/* Notes — toggle colapsável */}
+            <div>
+              <button
+                type="button"
+                onClick={() => setShowNotes(!showNotes)}
+                className="cursor-pointer flex items-center gap-1.5 text-xs text-dt-muted hover:text-white transition-colors"
+              >
+                <StickyNote className="h-3.5 w-3.5" />
+                {showNotes ? 'Esconder notas' : 'Adicionar nota (opcional)'}
+              </button>
+              {showNotes && (
+                <textarea
+                  {...register('notes')}
+                  placeholder="Anotações sobre esta transação..."
+                  rows={3}
+                  className="mt-2 w-full rounded-xl border border-dt-border bg-dt-card px-4 py-3 text-sm text-white placeholder:text-dt-muted/60 focus:border-dt-purple/60 focus:outline-none focus:ring-2 focus:ring-dt-purple/20 transition-all resize-none animate-fade-in"
+                />
               )}
             </div>
 

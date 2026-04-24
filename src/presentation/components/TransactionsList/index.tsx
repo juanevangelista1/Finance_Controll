@@ -1,11 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { Trash2, TrendingUp, TrendingDown, Search } from 'lucide-react'
+import { Trash2, TrendingUp, TrendingDown, Search, Tag } from 'lucide-react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { useTransactionsContext } from '../../contexts/TransactionsContext'
 import { formatCurrency, formatDate } from '../../../shared/utils/formatter'
 import { cn } from '../../../shared/utils/cn'
+import {
+  getCategoryLabel,
+  getSubcategoryLabel,
+  getCategoryIcon,
+} from '../../../domain/transaction/value-objects/CategoryRegistry'
 
 function DeleteConfirmModal({
   open,
@@ -52,6 +57,43 @@ function DeleteConfirmModal({
   )
 }
 
+function CategoryBadge({ type, category, subcategory }: { type: 'income' | 'outcome'; category: string; subcategory?: string }) {
+  const icon = getCategoryIcon(type, category)
+  const label = getCategoryLabel(type, category)
+  const subLabel = subcategory ? getSubcategoryLabel(type, category, subcategory) : null
+
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="inline-flex items-center gap-1 rounded-full border border-dt-border bg-dt-surface px-2.5 py-0.5 text-xs text-dt-muted">
+        <span>{icon}</span>
+        {label}
+      </span>
+      {subLabel && (
+        <span className="inline-flex items-center rounded-full bg-dt-purple/10 px-2 py-0.5 text-[10px] text-dt-purple-light">
+          ↳ {subLabel}
+        </span>
+      )}
+    </div>
+  )
+}
+
+function TagsList({ tags }: { tags?: string[] }) {
+  if (!tags || tags.length === 0) return null
+  return (
+    <div className="flex flex-wrap gap-1 mt-1">
+      {tags.map((tag) => (
+        <span
+          key={tag}
+          className="inline-flex items-center gap-0.5 rounded-md bg-dt-card border border-dt-border px-1.5 py-0.5 text-[10px] text-dt-muted"
+        >
+          <Tag className="h-2.5 w-2.5" />
+          {tag}
+        </span>
+      ))}
+    </div>
+  )
+}
+
 export function TransactionsList() {
   const { transactions, isLoading, deleteTransaction } = useTransactionsContext()
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; description: string } | null>(null)
@@ -88,7 +130,14 @@ export function TransactionsList() {
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-white truncate">{transaction.description}</p>
-                <p className="mt-0.5 text-xs text-dt-muted">{transaction.category}</p>
+                <div className="mt-1">
+                  <CategoryBadge
+                    type={transaction.type}
+                    category={transaction.category}
+                    subcategory={transaction.subcategory}
+                  />
+                </div>
+                <TagsList tags={transaction.tags} />
               </div>
               <button
                 onClick={() => setDeleteTarget({ id: transaction.id, description: transaction.description })}
@@ -146,7 +195,12 @@ export function TransactionsList() {
                 key={transaction.id}
                 className="transition-colors hover:bg-white/2 group"
               >
-                <td className="px-6 py-4 font-medium text-white">{transaction.description}</td>
+                <td className="px-6 py-4">
+                  <div>
+                    <span className="font-medium text-white">{transaction.description}</span>
+                    <TagsList tags={transaction.tags} />
+                  </div>
+                </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-1.5">
                     {transaction.type === 'income' ? (
@@ -166,9 +220,11 @@ export function TransactionsList() {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <span className="inline-flex items-center rounded-full border border-dt-border bg-dt-surface px-2.5 py-0.5 text-xs text-dt-muted">
-                    {transaction.category}
-                  </span>
+                  <CategoryBadge
+                    type={transaction.type}
+                    category={transaction.category}
+                    subcategory={transaction.subcategory}
+                  />
                 </td>
                 <td className="px-6 py-4 text-dt-muted">{formatDate(transaction.createdAt)}</td>
                 <td className="px-6 py-4">
