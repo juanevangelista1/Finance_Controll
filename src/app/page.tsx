@@ -1,31 +1,51 @@
-import { Summary } from '../presentation/components/Summary';
-import { MonthYearFilter } from '../presentation/components/MonthYearFilter';
-import { SearchForm } from '../presentation/components/SearchForm';
-import { TransactionsList } from '../presentation/components/TransactionsList';
+'use client'
+
+import { Summary } from '../presentation/components/Summary'
+import { MonthYearFilter } from '../presentation/components/MonthYearFilter'
+import { SearchForm } from '../presentation/components/SearchForm'
+import { TransactionsList } from '../presentation/components/TransactionsList'
+import { AIInsightsPanel } from '../presentation/components/AIInsightsPanel'
+import { useTransactionsContext } from '../presentation/contexts/TransactionsContext'
+import { useAIInsights } from '../presentation/hooks/useAIInsights'
 
 export default function DashboardPage() {
-	return (
-		<div className='mx-auto max-w-6xl px-4 py-6 sm:px-6 space-y-6'>
-			{/* Page Title */}
-			<div>
-				<h1 className='text-2xl font-bold text-white'>Controle Financeiro 🤑</h1>
-				<p className='mt-1 text-sm text-dt-muted'>Acompanhe suas finanças do período selecionado</p>
-			</div>
+  const { transactions, filter } = useTransactionsContext()
+  const { insights, isLoading: aiLoading, error: aiError, fetchInsights } = useAIInsights()
 
-			{/* Summary Cards */}
-			<Summary />
+  function handleGenerateInsights() {
+    fetchInsights(transactions, filter.month, filter.year)
+  }
 
-			{/* Month/Year Filter */}
-			<MonthYearFilter />
+  return (
+    <div className='mx-auto max-w-6xl px-4 py-6 sm:px-6 space-y-6'>
+      {/* Page Title */}
+      <div>
+        <h1 className='text-2xl font-bold text-white'>Controle Financeiro 🤑</h1>
+        <p className='mt-1 text-sm text-dt-muted'>Acompanhe suas finanças do período selecionado</p>
+      </div>
 
-			{/* Search & Transactions */}
-			<div className='space-y-4'>
-				<div className='flex items-center justify-between'>
-					<h2 className='text-base font-semibold text-white'>Transações</h2>
-				</div>
-				<SearchForm />
-				<TransactionsList />
-			</div>
-		</div>
-	);
+      {/* Summary Cards */}
+      <Summary />
+
+      {/* Month/Year Filter */}
+      <MonthYearFilter />
+
+      {/* AI Insights */}
+      <AIInsightsPanel
+        insights={insights}
+        isLoading={aiLoading}
+        error={aiError}
+        onGenerate={handleGenerateInsights}
+      />
+
+      {/* Search & Transactions */}
+      <div className='space-y-4'>
+        <div className='flex items-center justify-between'>
+          <h2 className='text-base font-semibold text-white'>Transações</h2>
+        </div>
+        <SearchForm />
+        <TransactionsList />
+      </div>
+    </div>
+  )
 }

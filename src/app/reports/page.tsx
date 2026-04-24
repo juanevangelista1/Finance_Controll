@@ -5,9 +5,12 @@ import { Download, TrendingUp, TrendingDown, Wallet, PieChart } from 'lucide-rea
 import { useTransactionsContext } from '../../presentation/contexts/TransactionsContext'
 import { useReports } from '../../presentation/hooks/useReports'
 import { useSummary } from '../../presentation/hooks/useSummary'
+import { useAIInsights } from '../../presentation/hooks/useAIInsights'
 import { MonthlyBarChart } from '../../presentation/components/Charts/MonthlyBarChart'
 import { CategoryPieChart } from '../../presentation/components/Charts/CategoryPieChart'
 import { BalanceLineChart } from '../../presentation/components/Charts/BalanceLineChart'
+import { SubcategoryBreakdown } from '../../presentation/components/SubcategoryBreakdown'
+import { AIInsightsPanel } from '../../presentation/components/AIInsightsPanel'
 import { formatCurrency, getYearRange } from '../../shared/utils/formatter'
 import { LocalStorageTransactionRepository } from '../../infrastructure/repositories/SessionStorageTransactionRepository'
 import { GetTransactionsUseCase } from '../../application/transaction/use-cases/GetTransactionsUseCase'
@@ -31,6 +34,11 @@ export default function ReportsPage() {
 
   const summary = useSummary(allYearTransactions)
   const { monthlyData, categoryData, balanceEvolution } = useReports(allYearTransactions, selectedYear)
+  const { insights, isLoading: aiLoading, error: aiError, fetchInsights } = useAIInsights()
+
+  function handleGenerateInsights() {
+    fetchInsights(allYearTransactions, undefined, selectedYear)
+  }
 
   async function handleExportPDF() {
     setExporting(true)
@@ -130,7 +138,7 @@ export default function ReportsPage() {
           </div>
         </div>
 
-        {/* Category Pie Chart */}
+        {/* Category Pie Chart + Drill-Down */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="rounded-xl border border-dt-border bg-dt-card p-5">
             <div className="flex items-center gap-2 mb-4">
@@ -140,47 +148,22 @@ export default function ReportsPage() {
             <CategoryPieChart data={categoryData} />
           </div>
 
-          {/* Category Breakdown */}
+          {/* Subcategory Drill-Down */}
           <div className="rounded-xl border border-dt-border bg-dt-card p-5">
             <h3 className="mb-4 text-sm font-semibold text-white">Detalhamento por Categoria</h3>
-            <div className="space-y-3 max-h-64 overflow-y-auto">
-              {categoryData.length === 0 ? (
-                <p className="text-sm text-dt-muted">Sem despesas no período</p>
-              ) : (
-                categoryData.map((cat) => {
-                  const totalOutcome = summary.outcome || 1
-                  const percentage = ((cat.value / totalOutcome) * 100).toFixed(1)
-                  return (
-                    <div key={cat.name}>
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="h-2.5 w-2.5 rounded-full flex-shrink-0"
-                            style={{ backgroundColor: cat.fill }}
-                          />
-                          <span className="text-sm text-white">{cat.name}</span>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-sm font-semibold text-white">{formatCurrency(cat.value)}</span>
-                          <span className="ml-2 text-xs text-dt-muted">{percentage}%</span>
-                        </div>
-                      </div>
-                      <div className="h-1.5 w-full rounded-full bg-dt-border overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-500"
-                          style={{
-                            width: `${percentage}%`,
-                            backgroundColor: cat.fill,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )
-                })
-              )}
+            <div className="max-h-80 overflow-y-auto">
+              <SubcategoryBreakdown transactions={allYearTransactions} />
             </div>
           </div>
         </div>
+
+        {/* AI Insights */}
+        <AIInsightsPanel
+          insights={insights}
+          isLoading={aiLoading}
+          error={aiError}
+          onGenerate={handleGenerateInsights}
+        />
       </div>
     </div>
   )

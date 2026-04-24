@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import * as Dialog from '@radix-ui/react-dialog'
-import { ArrowUpCircle, ArrowDownCircle, X, CalendarDays, ChevronDown, StickyNote } from 'lucide-react'
+import { ArrowUpCircle, ArrowDownCircle, X, CalendarDays, ChevronDown, StickyNote, Sparkles, Loader2 } from 'lucide-react'
 import { useTransactionsContext } from '../../contexts/TransactionsContext'
 import { cn } from '../../../shared/utils/cn'
 import { SmartTagInput } from '../SmartTagInput'
@@ -44,6 +44,8 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
   const { createTransaction } = useTransactionsContext()
   const [tags, setTags] = useState<string[]>([])
   const [showNotes, setShowNotes] = useState(false)
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiConfidence, setAiConfidence] = useState<number | null>(null)
 
   const {
     register,
@@ -80,7 +82,40 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
     reset({ type: 'income', date: todayISO() })
     setTags([])
     setShowNotes(false)
+    setAiLoading(false)
+    setAiConfidence(null)
   }
+
+  const handleAISuggest = useCallback(async () => {
+    const description = watch('description')
+    const amount = watch('amount')
+    if (!description || description.trim().length < 2) return
+
+    setAiLoading(true)
+    setAiConfidence(null)
+    try {
+      const response = await fetch('/api/ai/categorize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description, amount: amount || 0, type: currentType }),
+      })
+      if (response.ok) {
+        const result = await response.json()
+        if (result.category) {
+          setValue('category', result.category)
+          if (result.subcategory) {
+            // Small delay to let category change propagate
+            setTimeout(() => setValue('subcategory', result.subcategory), 50)
+          }
+          setAiConfidence(result.confidence)
+        }
+      }
+    } catch (err) {
+      console.error('AI suggest failed:', err)
+    } finally {
+      setAiLoading(false)
+    }
+  }, [currentType, setValue, watch])
 
   function handleClose() {
     resetForm()
@@ -154,18 +189,44 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
               />
             </div>
 
-            {/* Description */}
+            {/* Description + AI Suggest */}
             <div>
               <label className="mb-1.5 block text-sm font-medium text-dt-muted">
                 Descrição
               </label>
-              <input
-                {...register('description')}
-                placeholder="Ex: Ração Golden 15kg, Aluguel, Plantão 12h..."
-                className="h-11 w-full rounded-xl border border-dt-border bg-dt-card px-4 text-sm text-white placeholder:text-dt-muted/60 focus:border-dt-purple/60 focus:outline-none focus:ring-2 focus:ring-dt-purple/20 transition-all"
-              />
+              <div className="flex gap-2">
+                <input
+                  {...register('description')}
+                  placeholder="Ex: Ração Golden 15kg, Aluguel, Plantão 12h..."
+                  className="h-11 flex-1 rounded-xl border border-dt-border bg-dt-card px-4 text-sm text-white placeholder:text-dt-muted/60 focus:border-dt-purple/60 focus:outline-none focus:ring-2 focus:ring-dt-purple/20 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={handleAISuggest}
+                  disabled={aiLoading}
+                  title="Sugerir categoria com IA"
+                  className={cn(
+                    'cursor-pointer flex items-center gap-1.5 rounded-xl border px-3 text-xs font-medium transition-all flex-shrink-0',
+                    aiLoading
+                      ? 'border-dt-purple/30 bg-dt-purple/10 text-dt-muted'
+                      : 'border-dt-purple/40 bg-dt-purple/15 text-dt-purple-light hover:bg-dt-purple/25 active:scale-95',
+                  )}
+                >
+                  {aiLoading ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-3.5 w-3.5" />
+                  )}
+                  <span className="hidden sm:inline">{aiLoading ? 'IA...' : '✨ IA'}</span>
+                </button>
+              </div>
               {errors.description && (
                 <p className="mt-1 text-xs text-dt-red">{errors.description.message}</p>
+              )}
+              {aiConfidence !== null && (
+                <p className="mt-1 text-xs text-dt-purple-light animate-fade-in">
+                  ✨ Categorizado pela IA (confiança: {(aiConfidence * 100).toFixed(0)}%)
+                </p>
               )}
             </div>
 

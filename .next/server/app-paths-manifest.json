@@ -1,5 +1,7 @@
 {
+  "/api/ai/categorize/route": "app/api/ai/categorize/route.js",
   "/_not-found/page": "app/_not-found/page.js",
-  "/reports/page": "app/reports/page.js",
-  "/page": "app/page.js"
+  "/api/ai/insights/route": "app/api/ai/insights/route.js",
+  "/page": "app/page.js",
+  "/reports/page": "app/reports/page.js"
 }
