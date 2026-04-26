@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -49,6 +49,15 @@ interface Props {
 	onOpenChange: (open: boolean) => void;
 }
 
+const FRESH_VALUES = {
+	type: 'income' as const,
+	date: todayISO(),
+	description: '',
+	category: '',
+	subcategory: '',
+	notes: '',
+}
+
 export function NewTransactionModal({ open, onOpenChange }: Props) {
 	const { createTransaction } = useTransactionsContext();
 	const [tags, setTags] = useState<string[]>([]);
@@ -69,6 +78,16 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
 		defaultValues: { type: 'income', date: todayISO() },
 	});
 
+	useEffect(() => {
+		if (open) {
+			reset({ ...FRESH_VALUES, date: todayISO() });
+			setTags([]);
+			setShowNotes(false);
+			setAiLoading(false);
+			setAiConfidence(null);
+		}
+	}, [open, reset]);
+
 	const currentType = watch('type');
 	const currentCategory = watch('category');
 
@@ -86,24 +105,7 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
 			tags: tags.length > 0 ? tags : undefined,
 			notes: data.notes || undefined,
 		});
-		resetForm();
 		onOpenChange(false);
-	}
-
-	function resetForm() {
-		reset({
-			type: 'income',
-			date: todayISO(),
-			description: '',
-			amount: 0,
-			category: '',
-			subcategory: '',
-			notes: '',
-		});
-		setTags([]);
-		setShowNotes(false);
-		setAiLoading(false);
-		setAiConfidence(null);
 	}
 
 	const handleAISuggest = useCallback(async () => {
@@ -138,7 +140,6 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
 	}, [currentType, setValue, watch]);
 
 	function handleClose() {
-		resetForm();
 		onOpenChange(false);
 	}
 
