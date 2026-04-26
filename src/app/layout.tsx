@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { TransactionsProvider } from '../presentation/contexts/TransactionsContext'
-import { Header } from '../presentation/components/Header'
-import { Footer } from '../presentation/components/Footer'
+import { LayoutShell } from '../presentation/components/LayoutShell'
 
 export const metadata: Metadata = {
   title: 'DT Money — Controle Financeiro',
@@ -14,11 +13,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR">
       <body className="flex min-h-screen flex-col bg-dt-bg antialiased">
         <TransactionsProvider>
-          <Header />
-          <main className="flex-1">
+          <LayoutShell>
             {children}
-          </main>
-          <Footer />
+          </LayoutShell>
         </TransactionsProvider>
       </body>
     </html>
