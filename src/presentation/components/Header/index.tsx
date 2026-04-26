@@ -2,15 +2,22 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { TrendingUp, BarChart2, Menu, X, Plus } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { TrendingUp, BarChart2, Menu, X, Plus, LogOut } from 'lucide-react'
 import { NewTransactionModal } from '../NewTransactionModal'
 import { cn } from '../../../shared/utils/cn'
 
 export function Header() {
   const pathname = usePathname()
+  const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
+
+  async function handleLogout() {
+    await fetch('/api/auth/logout', { method: 'POST' })
+    router.push('/login')
+    router.refresh()
+  }
 
   const navLinks = [
     { href: '/', label: 'Dashboard' },
@@ -59,6 +66,14 @@ export function Header() {
                 <Plus className="h-4 w-4" />
                 <span className="hidden sm:inline">Nova transação</span>
                 <span className="sm:hidden">Nova</span>
+              </button>
+
+              <button
+                onClick={handleLogout}
+                className="cursor-pointer p-2 rounded-lg text-dt-muted hover:text-white hover:bg-white/5 transition-colors"
+                title="Sair"
+              >
+                <LogOut className="h-4 w-4" />
               </button>
 
               {/* Mobile menu */}
