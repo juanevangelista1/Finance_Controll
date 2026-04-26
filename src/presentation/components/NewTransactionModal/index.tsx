@@ -91,7 +91,15 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
 	}
 
 	function resetForm() {
-		reset({ type: 'income', date: todayISO() });
+		reset({
+			type: 'income',
+			date: todayISO(),
+			description: '',
+			amount: 0,
+			category: '',
+			subcategory: '',
+			notes: '',
+		});
 		setTags([]);
 		setShowNotes(false);
 		setAiLoading(false);

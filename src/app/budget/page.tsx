@@ -35,8 +35,6 @@ export default function BudgetPage() {
   }
 
   function nextMonth() {
-    const isCurrentMonth = month === now.getMonth() && year === now.getFullYear()
-    if (isCurrentMonth) return
     if (month === 11) { setMonth(0); setYear((y) => y + 1) }
     else setMonth((m) => m + 1)
   }
@@ -49,7 +47,6 @@ export default function BudgetPage() {
     fetchInsights(monthTx, month, year)
   }
 
-  const isCurrentMonth = month === now.getMonth() && year === now.getFullYear()
   const totalOutsideBuckets = budget.uncategorizedAmount
 
   const overallHealth = useMemo(() => {
@@ -85,11 +82,7 @@ export default function BudgetPage() {
           </span>
           <button
             onClick={nextMonth}
-            disabled={isCurrentMonth}
-            className={cn(
-              'p-1 rounded transition-colors',
-              isCurrentMonth ? 'text-dt-border cursor-default' : 'cursor-pointer text-dt-muted hover:text-white',
-            )}
+            className="cursor-pointer p-1 rounded text-dt-muted hover:text-white transition-colors"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
