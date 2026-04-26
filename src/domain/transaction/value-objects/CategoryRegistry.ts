@@ -124,6 +124,18 @@ export const OUTCOME_CATEGORY_REGISTRY: CategoryDefinition[] = [
     ],
   },
   {
+    value: 'aporte_investimento',
+    label: 'Investimentos',
+    icon: '📈',
+    subcategories: [
+      { value: 'previdencia', label: 'Previdência' },
+      { value: 'acoes', label: 'Ações/FIIs' },
+      { value: 'renda_fixa', label: 'Renda Fixa/CDB/Tesouro' },
+      { value: 'poupanca', label: 'Poupança/Reserva' },
+      { value: 'cripto', label: 'Criptomoedas' },
+    ],
+  },
+  {
     value: 'outros_saida',
     label: 'Outros',
     icon: '📦',

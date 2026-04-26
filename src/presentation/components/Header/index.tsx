@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { TrendingUp, BarChart2, Menu, X, Plus, LogOut } from 'lucide-react'
+import { TrendingUp, BarChart2, Wallet, Menu, X, Plus, LogOut } from 'lucide-react'
 import { NewTransactionModal } from '../NewTransactionModal'
 import { cn } from '../../../shared/utils/cn'
 
@@ -20,8 +20,9 @@ export function Header() {
   }
 
   const navLinks = [
-    { href: '/', label: 'Dashboard' },
-    { href: '/reports', label: 'Relatórios' },
+    { href: '/', label: 'Dashboard', icon: TrendingUp },
+    { href: '/budget', label: 'Orçamento', icon: Wallet },
+    { href: '/reports', label: 'Relatórios', icon: BarChart2 },
   ]
 
   return (
@@ -55,6 +56,7 @@ export function Header() {
                   {link.label}
                 </Link>
               ))}
+
             </nav>
 
             {/* Actions */}
@@ -102,7 +104,7 @@ export function Header() {
                       : 'text-dt-muted hover:text-white hover:bg-white/5',
                   )}
                 >
-                  {link.href === '/' ? <TrendingUp className="h-4 w-4" /> : <BarChart2 className="h-4 w-4" />}
+                  <link.icon className="h-4 w-4" />
                   {link.label}
                 </Link>
               ))}

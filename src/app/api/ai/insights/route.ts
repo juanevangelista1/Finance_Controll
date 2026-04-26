@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
-
 export async function POST(request: Request) {
   try {
     const body = await request.json()
@@ -15,6 +13,8 @@ export async function POST(request: Request) {
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json({ error: 'GEMINI_API_KEY not configured' }, { status: 500 })
     }
+
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
 
     // Build summary of transactions for context
     const totalIncome = transactions
@@ -47,6 +47,28 @@ export async function POST(request: Request) {
       )
       .join('\n')
 
+    const necessidadesCategories = ['moradia', 'saude', 'educacao', 'transporte', 'servicos']
+    const pessoalCategories = ['alimentacao', 'lazer', 'compras', 'pets', 'outros_saida']
+    const investimentosCategories = ['aporte_investimento']
+
+    const necessidadesSpent = transactions
+      .filter((t: { type: string; category: string }) => t.type === 'outcome' && necessidadesCategories.includes(t.category))
+      .reduce((s: number, t: { amount: number }) => s + t.amount, 0)
+    const pessoalSpent = transactions
+      .filter((t: { type: string; category: string }) => t.type === 'outcome' && pessoalCategories.includes(t.category))
+      .reduce((s: number, t: { amount: number }) => s + t.amount, 0)
+    const investimentosSpent = transactions
+      .filter((t: { type: string; category: string }) => t.type === 'outcome' && investimentosCategories.includes(t.category))
+      .reduce((s: number, t: { amount: number }) => s + t.amount, 0)
+
+    const budgetSection = totalIncome > 0 ? `
+CONTROLE ORÇAMENTÁRIO (Regra 50/30/20):
+- Necessidades Fixas (meta 50% = R$ ${(totalIncome * 0.5).toFixed(2)}): gasto R$ ${necessidadesSpent.toFixed(2)} (${((necessidadesSpent / totalIncome) * 100).toFixed(1)}%)
+- Pessoal & Casal (meta 30% = R$ ${(totalIncome * 0.3).toFixed(2)}): gasto R$ ${pessoalSpent.toFixed(2)} (${((pessoalSpent / totalIncome) * 100).toFixed(1)}%)
+- Investimentos (meta 20% = R$ ${(totalIncome * 0.2).toFixed(2)}): aportado R$ ${investimentosSpent.toFixed(2)} (${((investimentosSpent / totalIncome) * 100).toFixed(1)}%)
+- Orçamento total: ${((totalOutcome / totalIncome) * 100).toFixed(1)}% da renda utilizado
+` : ''
+
     const prompt = `Você é um consultor financeiro pessoal brasileiro, inteligente e objetivo. Analise os dados financeiros do período "${period}" e gere insights acionáveis.
 
 RESUMO DO PERÍODO:
@@ -54,7 +76,7 @@ RESUMO DO PERÍODO:
 - Total de Saídas: R$ ${totalOutcome.toFixed(2)}
 - Saldo: R$ ${(totalIncome - totalOutcome).toFixed(2)}
 - Total de transações: ${transactions.length}
-
+${budgetSection}
 GASTOS POR CATEGORIA:
 ${Object.entries(categoryBreakdown).map(([cat, val]) => `- ${cat}: R$ ${(val as number).toFixed(2)}`).join('\n')}
 
@@ -64,14 +86,15 @@ ${Object.entries(subcategoryBreakdown).map(([sub, val]) => `- ${sub}: R$ ${(val 
 TRANSAÇÕES:
 ${transactionList}
 
-CONTEXTO: O usuário tem 3 gatos. Seja específico quando mencionar gastos com pets.
+CONTEXTO: O casal usa a regra 50/30/20 para controle financeiro. Eles têm 3 gatos. Priorize insights sobre desvios do orçamento 50/30/20 e gastos que podem impactar negativamente as finanças. Seja específico quando mencionar gastos com pets.
 
 Gere exatamente entre 3 e 5 insights no formato JSON. Cada insight deve ser:
 - Prático e específico (com valores em R$)
 - Curto e direto (máximo 2 frases no message)
 - Relevante para o período analisado
+- Quando houver desvio do orçamento 50/30/20, mencione o bucket afetado
 
-Tipos permitidos: "tip" (dica de economia), "warning" (alerta de gasto alto), "achievement" (conquista/elogio), "pattern" (padrão detectado)
+Tipos permitidos: "tip" (dica de economia), "warning" (alerta de gasto alto ou desvio do orçamento), "achievement" (conquista/elogio quando meta atingida), "pattern" (padrão detectado)
 
 Responda APENAS com um JSON array válido:
 [{"type": "tip", "icon": "💡", "title": "título curto", "message": "mensagem breve e específica com valores"},...]
@@ -110,9 +133,10 @@ Não inclua explicações, apenas o JSON array.`
 
     return NextResponse.json(insights)
   } catch (error) {
-    console.error('AI insights error:', error)
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('AI insights error:', message)
     return NextResponse.json(
-      { error: 'Failed to generate insights' },
+      { error: 'Failed to generate insights', detail: message },
       { status: 500 },
     )
   }
