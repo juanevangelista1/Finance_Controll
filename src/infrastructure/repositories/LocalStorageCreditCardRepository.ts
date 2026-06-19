@@ -13,7 +13,14 @@ export class LocalStorageCreditCardRepository implements ICreditCardRepository {
     if (typeof window === 'undefined') return []
     const stored = localStorage.getItem(STORAGE_KEY)
     if (!stored) return []
-    return JSON.parse(stored) as CreditCard[]
+    try {
+      const parsed = JSON.parse(stored) as CreditCard[]
+      return Array.isArray(parsed) ? parsed : []
+    } catch {
+      localStorage.setItem(`${STORAGE_KEY}:corrupted:${Date.now()}`, stored)
+      console.error('Dados corrompidos em', STORAGE_KEY, '— backup salvo, retornando lista vazia')
+      return []
+    }
   }
 
   private persist(cards: CreditCard[]): void {
