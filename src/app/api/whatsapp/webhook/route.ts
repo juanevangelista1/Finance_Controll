@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import { NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { getTransactionsFromRedis, saveTransactionsToRedis } from '../../../../lib/redis'
@@ -7,6 +8,25 @@ import type { Transaction } from '../../../../domain/transaction/entities/Transa
 
 function generateId(): string {
   return `wa-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+}
+
+// Valida que a requisição realmente veio da Meta (HMAC-SHA256 sobre o corpo bruto)
+function isValidSignature(rawBody: string, signatureHeader: string | null): boolean {
+  const appSecret = process.env.WHATSAPP_APP_SECRET
+  if (!appSecret || !signatureHeader) return false
+
+  const expected = `sha256=${crypto.createHmac('sha256', appSecret).update(rawBody).digest('hex')}`
+  const sigBuf = Buffer.from(signatureHeader)
+  const expBuf = Buffer.from(expected)
+  if (sigBuf.length !== expBuf.length) return false
+  return crypto.timingSafeEqual(sigBuf, expBuf)
+}
+
+// Restringe quem pode interagir com o bot, mesmo com assinatura válida da Meta
+function isAllowedNumber(phone: string): boolean {
+  const allowed = process.env.WHATSAPP_ALLOWED_NUMBERS
+  if (!allowed) return false
+  return allowed.split(',').map((n) => n.trim()).includes(phone)
 }
 
 function formatCurrency(value: number): string {
@@ -43,7 +63,14 @@ export async function GET(request: Request) {
 // ── POST — recebe mensagens do WhatsApp ──────────────────────────────────────
 
 export async function POST(request: Request) {
-  const body = await request.json()
+  const rawBody = await request.text()
+
+  if (!isValidSignature(rawBody, request.headers.get('x-hub-signature-256'))) {
+    console.error('WhatsApp webhook: assinatura inválida ou ausente')
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
+  }
+
+  const body = JSON.parse(rawBody)
 
   // Extrai a mensagem de texto recebida
   const entry = body?.entry?.[0]
@@ -55,6 +82,12 @@ export async function POST(request: Request) {
   }
 
   const fromNumber = message.from as string
+
+  if (!isAllowedNumber(fromNumber)) {
+    console.error('WhatsApp webhook: número não autorizado tentou interagir:', fromNumber)
+    return NextResponse.json({ ok: true }) // ignora silenciosamente, sem dar pistas
+  }
+
   const userText = message.text.body as string
   const phoneNumberId = change.value.metadata.phone_number_id as string
 

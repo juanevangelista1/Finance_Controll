@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
 import { getJwtSecret } from './lib/jwt'
 
-const PUBLIC_PATHS = ['/login', '/api/auth/login']
+// /api/whatsapp/webhook é chamado pela Meta (sem cookie de sessão) — sua
+// segurança é feita por verificação de assinatura HMAC dentro da própria rota
+const PUBLIC_PATHS = ['/login', '/api/auth/login', '/api/whatsapp/webhook']
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
