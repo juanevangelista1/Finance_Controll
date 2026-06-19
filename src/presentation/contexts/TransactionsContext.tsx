@@ -68,6 +68,16 @@ const initialFilter: TransactionFilterDTO = {
   year: now.getFullYear(),
 }
 
+// Sincroniza todas as transações do localStorage com o Redis (fire-and-forget)
+function syncToCloud() {
+  const all = new GetTransactionsUseCase(repository).execute()
+  fetch('/api/transactions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(all),
+  }).catch(() => { /* sync falhou silenciosamente, dados ainda estão no localStorage */ })
+}
+
 // --- Provider ---
 export function TransactionsProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, {
@@ -90,6 +100,7 @@ export function TransactionsProvider({ children }: { children: ReactNode }) {
     (data: CreateTransactionDTO) => {
       createUseCase.execute(data)
       loadTransactions(state.filter)
+      syncToCloud()
     },
     [state.filter, loadTransactions],
   )
@@ -98,6 +109,7 @@ export function TransactionsProvider({ children }: { children: ReactNode }) {
     (id: string) => {
       deleteUseCase.execute(id)
       loadTransactions(state.filter)
+      syncToCloud()
     },
     [state.filter, loadTransactions],
   )
