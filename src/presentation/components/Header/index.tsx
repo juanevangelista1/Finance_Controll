@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { TrendingUp, BarChart2, Wallet, Menu, X, Plus, LogOut } from 'lucide-react'
+import { TrendingUp, BarChart2, Wallet, Menu, X, Plus, LogOut, CreditCard, Calculator } from 'lucide-react'
 import { NewTransactionModal } from '../NewTransactionModal'
 import { cn } from '../../../shared/utils/cn'
 
@@ -22,6 +22,8 @@ export function Header() {
   const navLinks = [
     { href: '/', label: 'Dashboard', icon: TrendingUp },
     { href: '/budget', label: 'Orçamento', icon: Wallet },
+    { href: '/cards', label: 'Cartões', icon: CreditCard },
+    { href: '/closing', label: 'Fechamento', icon: Calculator },
     { href: '/reports', label: 'Relatórios', icon: BarChart2 },
   ]
 
