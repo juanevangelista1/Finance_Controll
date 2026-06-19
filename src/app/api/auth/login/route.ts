@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import { SignJWT } from 'jose'
 import { getJwtSecret } from '../../../../lib/jwt'
+import { checkRateLimit } from '../../../../lib/rateLimit'
+
+const LOGIN_ATTEMPT_LIMIT = 5
+const LOGIN_WINDOW_SECONDS = 60
 
 type User = { username: string; password: string }
 
@@ -20,6 +24,15 @@ function getUsers(): User[] {
 
 export async function POST(request: Request) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    const allowed = await checkRateLimit(`ratelimit:login:${ip}`, LOGIN_ATTEMPT_LIMIT, LOGIN_WINDOW_SECONDS)
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Muitas tentativas de login. Aguarde um minuto e tente novamente.' },
+        { status: 429 },
+      )
+    }
+
     const { username, password } = await request.json()
 
     const users = getUsers()
