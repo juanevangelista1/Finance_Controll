@@ -32,6 +32,7 @@ const schema = z.object({
 	type: z.enum(['income', 'outcome']),
 	date: z.string().min(1, 'Data obrigatória'),
 	notes: z.string().optional(),
+	installmentTotal: z.coerce.number().int().min(1).max(60).optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -64,6 +65,7 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
 	const [showNotes, setShowNotes] = useState(false);
 	const [aiLoading, setAiLoading] = useState(false);
 	const [aiConfidence, setAiConfidence] = useState<number | null>(null);
+	const [isInstallment, setIsInstallment] = useState(false);
 
 	const {
 		register,
@@ -85,6 +87,7 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
 			setShowNotes(false);
 			setAiLoading(false);
 			setAiConfidence(null);
+			setIsInstallment(false);
 		}
 	}, [open, reset]);
 
@@ -104,6 +107,7 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
 			subcategory: data.subcategory || undefined,
 			tags: tags.length > 0 ? tags : undefined,
 			notes: data.notes || undefined,
+			installmentTotal: isInstallment ? data.installmentTotal : undefined,
 		});
 		onOpenChange(false);
 	}
@@ -289,6 +293,37 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
 								{errors.date && <p className='mt-1 text-xs text-dt-red'>{errors.date.message}</p>}
 							</div>
 						</div>
+
+						{/* Parcelamento — apenas para saídas */}
+						{currentType === 'outcome' && (
+							<div>
+								<label className='flex items-center gap-2 cursor-pointer'>
+									<input
+										type='checkbox'
+										checked={isInstallment}
+										onChange={(e) => setIsInstallment(e.target.checked)}
+										className='h-4 w-4 cursor-pointer rounded border-dt-border bg-dt-card accent-dt-purple'
+									/>
+									<span className='text-sm font-medium text-dt-muted'>Compra parcelada?</span>
+								</label>
+								{isInstallment && (
+									<div className='mt-2 animate-fade-in'>
+										<label className='mb-1.5 block text-sm font-medium text-dt-muted'>Quantidade de parcelas</label>
+										<input
+											{...register('installmentTotal')}
+											type='number'
+											min={2}
+											max={60}
+											placeholder='Ex: 10'
+											className='h-11 w-full rounded-xl border border-dt-border bg-dt-card px-4 text-sm text-white placeholder:text-dt-muted/60 focus:border-dt-purple/60 focus:outline-none focus:ring-2 focus:ring-dt-purple/20 transition-all'
+										/>
+										<p className='mt-1 text-xs text-dt-muted'>
+											Cada parcela terá o valor informado acima, lançada em meses consecutivos.
+										</p>
+									</div>
+								)}
+							</div>
+						)}
 
 						{/* Category — seletor com ícones */}
 						<div>

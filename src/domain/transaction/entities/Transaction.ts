@@ -1,3 +1,9 @@
+export interface InstallmentInfo {
+  current: number
+  total: number
+  groupId: string
+}
+
 export interface Transaction {
   id: string
   description: string
@@ -8,4 +14,5 @@ export interface Transaction {
   tags?: string[]
   notes?: string
   createdAt: string
+  installment?: InstallmentInfo
 }

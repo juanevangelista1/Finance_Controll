@@ -1,3 +1,5 @@
+import type { InstallmentInfo } from '../../../domain/transaction/entities/Transaction'
+
 export interface CreateTransactionDTO {
   description: string
   amount: number
@@ -7,6 +9,8 @@ export interface CreateTransactionDTO {
   tags?: string[]
   notes?: string
   date: string // YYYY-MM-DD
+  installmentTotal?: number // se > 1, gera N transações parceladas
+  installment?: InstallmentInfo // uso interno do use-case, não preencher manualmente
 }
 
 export interface TransactionFilterDTO {

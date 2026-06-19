@@ -55,10 +55,12 @@ function CategoryBadge({
 	type,
 	category,
 	subcategory,
+	installment,
 }: {
 	type: 'income' | 'outcome';
 	category: string;
 	subcategory?: string;
+	installment?: { current: number; total: number };
 }) {
 	const icon = getCategoryIcon(type, category);
 	const label = getCategoryLabel(type, category);
@@ -73,6 +75,11 @@ function CategoryBadge({
 			{subLabel && (
 				<span className='inline-flex items-center rounded-full bg-dt-purple/10 px-2 py-0.5 text-[10px] text-dt-purple-light'>
 					↳ {subLabel}
+				</span>
+			)}
+			{installment && (
+				<span className='inline-flex items-center rounded-full bg-yellow-400/10 px-2 py-0.5 text-[10px] text-yellow-400'>
+					💳 {installment.current}/{installment.total}
 				</span>
 			)}
 		</div>
@@ -138,6 +145,7 @@ export function TransactionsList() {
 										type={transaction.type}
 										category={transaction.category}
 										subcategory={transaction.subcategory}
+										installment={transaction.installment}
 									/>
 								</div>
 								<TagsList tags={transaction.tags} />
@@ -225,6 +233,7 @@ export function TransactionsList() {
 										type={transaction.type}
 										category={transaction.category}
 										subcategory={transaction.subcategory}
+										installment={transaction.installment}
 									/>
 								</td>
 								<td className='px-6 py-4 text-dt-muted'>{formatDate(transaction.createdAt)}</td>

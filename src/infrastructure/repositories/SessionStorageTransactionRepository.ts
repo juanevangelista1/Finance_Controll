@@ -23,6 +23,7 @@ function migrateTransaction(raw: Record<string, unknown>): Transaction {
     tags: Array.isArray(raw.tags) ? (raw.tags as string[]) : [],
     notes: (raw.notes as string) ?? undefined,
     createdAt: raw.createdAt as string,
+    installment: (raw.installment as Transaction['installment']) ?? undefined,
   }
 }
 
@@ -63,6 +64,7 @@ export class LocalStorageTransactionRepository implements ITransactionRepository
       tags: data.tags ?? [],
       notes: data.notes,
       createdAt: localDate.toISOString(),
+      installment: data.installment,
     }
     this.persist([...transactions, newTransaction])
     return newTransaction
