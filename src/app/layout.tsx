@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { TransactionsProvider } from '../presentation/contexts/TransactionsContext'
+import { CreditCardsProvider } from '../presentation/contexts/CreditCardsContext'
 import { LayoutShell } from '../presentation/components/LayoutShell'
 
 export const metadata: Metadata = {
@@ -13,9 +14,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR">
       <body className="flex min-h-screen flex-col bg-dt-bg antialiased">
         <TransactionsProvider>
-          <LayoutShell>
-            {children}
-          </LayoutShell>
+          <CreditCardsProvider>
+            <LayoutShell>
+              {children}
+            </LayoutShell>
+          </CreditCardsProvider>
         </TransactionsProvider>
       </body>
     </html>
