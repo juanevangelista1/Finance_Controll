@@ -8,6 +8,11 @@ function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
 }
 
+// Evita drift de ponto flutuante (ex: 0.1 + 0.2) em valores monetários
+function roundCurrency(value: number): number {
+  return Math.round(value * 100) / 100
+}
+
 /**
  * Migrates legacy transactions (without new fields) to the current schema.
  * Ensures backward compatibility when new fields are added.
@@ -66,7 +71,7 @@ export class LocalStorageTransactionRepository implements ITransactionRepository
       id: generateId(),
       description: data.description,
       type: data.type,
-      amount: data.amount,
+      amount: roundCurrency(data.amount),
       category: data.category,
       subcategory: data.subcategory,
       tags: data.tags ?? [],
