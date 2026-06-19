@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
+import { getJwtSecret } from './lib/jwt'
 
 const PUBLIC_PATHS = ['/login', '/api/auth/login']
 
@@ -20,8 +21,7 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'fallback-secret')
-    await jwtVerify(token, secret)
+    await jwtVerify(token, getJwtSecret())
     return NextResponse.next()
   } catch {
     if (pathname.startsWith('/api/')) {

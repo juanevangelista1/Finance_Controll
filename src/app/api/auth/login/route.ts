@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { SignJWT } from 'jose'
+import { getJwtSecret } from '../../../../lib/jwt'
 
 type User = { username: string; password: string }
 
@@ -28,12 +29,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Usuário ou senha incorretos' }, { status: 401 })
     }
 
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'fallback-secret')
     const token = await new SignJWT({ username })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
       .setExpirationTime('7d')
-      .sign(secret)
+      .sign(getJwtSecret())
 
     const response = NextResponse.json({ success: true })
     response.cookies.set('dt-money-token', token, {
