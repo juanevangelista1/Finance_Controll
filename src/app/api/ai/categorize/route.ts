@@ -5,8 +5,6 @@ import {
   INCOME_CATEGORY_REGISTRY,
 } from '../../../../domain/transaction/value-objects/CategoryRegistry'
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
-
 function buildCategoryList(type: 'income' | 'outcome'): string {
   const registry = type === 'income' ? INCOME_CATEGORY_REGISTRY : OUTCOME_CATEGORY_REGISTRY
   return registry
@@ -30,6 +28,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'GEMINI_API_KEY not configured' }, { status: 500 })
     }
 
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
     const categoryList = buildCategoryList(type)
 
     const prompt = `Você é um assistente financeiro brasileiro. Analise a descrição de uma transação e categorize-a.
