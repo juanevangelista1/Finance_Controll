@@ -14,6 +14,7 @@ dist-ssr
 .env
 .next
 .next/*
+*.tsbuildinfo
 
 
 # Editor directories and files
