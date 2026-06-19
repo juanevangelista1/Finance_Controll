@@ -5,6 +5,7 @@ export interface ITransactionRepository {
   findAll(): Transaction[]
   findById(id: string): Transaction | undefined
   create(data: CreateTransactionDTO): Transaction
+  createMany(items: CreateTransactionDTO[]): Transaction[]
   delete(id: string): void
   clear(): void
 }

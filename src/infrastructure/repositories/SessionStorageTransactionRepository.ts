@@ -62,12 +62,11 @@ export class LocalStorageTransactionRepository implements ITransactionRepository
     return this.getAll().find((t) => t.id === id)
   }
 
-  create(data: CreateTransactionDTO): Transaction {
-    const transactions = this.getAll()
+  private buildTransaction(data: CreateTransactionDTO): Transaction {
     // Parse the date as local noon to avoid UTC offset crossing month boundary
     const [y, m, d] = data.date.split('-').map(Number)
     const localDate = new Date(y, m - 1, d, 12, 0, 0)
-    const newTransaction: Transaction = {
+    return {
       id: generateId(),
       description: data.description,
       type: data.type,
@@ -79,8 +78,20 @@ export class LocalStorageTransactionRepository implements ITransactionRepository
       createdAt: localDate.toISOString(),
       installment: data.installment,
     }
+  }
+
+  create(data: CreateTransactionDTO): Transaction {
+    const transactions = this.getAll()
+    const newTransaction = this.buildTransaction(data)
     this.persist([...transactions, newTransaction])
     return newTransaction
+  }
+
+  createMany(items: CreateTransactionDTO[]): Transaction[] {
+    const transactions = this.getAll()
+    const newTransactions = items.map((item) => this.buildTransaction(item))
+    this.persist([...transactions, ...newTransactions])
+    return newTransactions
   }
 
   delete(id: string): void {

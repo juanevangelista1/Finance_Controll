@@ -26,17 +26,13 @@ export class CreateTransactionUseCase {
     }
 
     const groupId = generateGroupId()
-    let firstTransaction: Transaction | null = null
+    const items: CreateTransactionDTO[] = Array.from({ length: total }, (_, i) => ({
+      ...data,
+      date: addMonths(data.date, i),
+      installment: { current: i + 1, total, groupId },
+    }))
 
-    for (let i = 1; i <= total; i++) {
-      const transaction = this.repository.create({
-        ...data,
-        date: addMonths(data.date, i - 1),
-        installment: { current: i, total, groupId },
-      })
-      if (i === 1) firstTransaction = transaction
-    }
-
-    return firstTransaction as Transaction
+    const created = this.repository.createMany(items)
+    return created[0]
   }
 }
