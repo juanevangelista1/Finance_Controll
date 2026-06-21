@@ -41,18 +41,18 @@ O **DT Money** é uma aplicação web de controle financeiro pessoal construída
 
 ### Tecnologias
 
-| Camada | Tecnologia |
-|---|---|
-| Framework | Next.js 15 (App Router) |
-| UI Library | React 19 |
-| Linguagem | TypeScript 5.6 |
-| Estilização | Tailwind CSS 3.4 |
-| Gráficos | Recharts 2 |
-| Formulários | React Hook Form + Zod |
-| Componentes | Radix UI (Dialog) |
-| Ícones | Lucide React |
-| PDF Export | jsPDF + html2canvas |
-| Utilitários | clsx + tailwind-merge |
+| Camada      | Tecnologia              |
+| ----------- | ----------------------- |
+| Framework   | Next.js 15 (App Router) |
+| UI Library  | React 19                |
+| Linguagem   | TypeScript 5.6          |
+| Estilização | Tailwind CSS 3.4        |
+| Gráficos    | Recharts 2              |
+| Formulários | React Hook Form + Zod   |
+| Componentes | Radix UI (Dialog)       |
+| Ícones      | Lucide React            |
+| PDF Export  | jsPDF + html2canvas     |
+| Utilitários | clsx + tailwind-merge   |
 
 ---
 
@@ -131,10 +131,10 @@ npm run lint     # Verificar lint
 
 ### Telas
 
-| Rota | Descrição |
-|---|---|
-| `/` | Dashboard com resumo, filtros e listagem de transações |
-| `/reports` | Relatórios anuais com gráficos e exportação em PDF |
+| Rota       | Descrição                                              |
+| ---------- | ------------------------------------------------------ |
+| `/`        | Dashboard com resumo, filtros e listagem de transações |
+| `/reports` | Relatórios anuais com gráficos e exportação em PDF     |
 
 ---
 
@@ -154,13 +154,14 @@ Alimentação · Moradia · Transporte · Saúde · Educação · Lazer · Assin
 
 <div align="center">
 
-Desenvolvido com ♥ por **[Juan Evangelista](https://www.linkedin.com/in/juan-evangelista/)**
+Desenvolvido com ♥ por **[Juan Evangelista](https://www.linkedin.com/in/juan-evangelista-developer/)**
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Juan%20Evangelista-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/juan-evangelista/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Juan%20Evangelista-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/juan-evangelista-developer/)
 
 </div>
 
 ---
+
 ---
 
 ## 🇺🇸 English Version
@@ -187,18 +188,18 @@ Desenvolvido com ♥ por **[Juan Evangelista](https://www.linkedin.com/in/juan-e
 
 ### Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 15 (App Router) |
-| UI Library | React 19 |
-| Language | TypeScript 5.6 |
-| Styling | Tailwind CSS 3.4 |
-| Charts | Recharts 2 |
-| Forms | React Hook Form + Zod |
-| Components | Radix UI (Dialog) |
-| Icons | Lucide React |
-| PDF Export | jsPDF + html2canvas |
-| Utilities | clsx + tailwind-merge |
+| Layer      | Technology              |
+| ---------- | ----------------------- |
+| Framework  | Next.js 15 (App Router) |
+| UI Library | React 19                |
+| Language   | TypeScript 5.6          |
+| Styling    | Tailwind CSS 3.4        |
+| Charts     | Recharts 2              |
+| Forms      | React Hook Form + Zod   |
+| Components | Radix UI (Dialog)       |
+| Icons      | Lucide React            |
+| PDF Export | jsPDF + html2canvas     |
+| Utilities  | clsx + tailwind-merge   |
 
 ---
 
@@ -277,10 +278,10 @@ npm run lint     # Run linter
 
 ### Pages
 
-| Route | Description |
-|---|---|
-| `/` | Dashboard with summary, filters and transaction list |
-| `/reports` | Annual reports with charts and PDF export |
+| Route      | Description                                          |
+| ---------- | ---------------------------------------------------- |
+| `/`        | Dashboard with summary, filters and transaction list |
+| `/reports` | Annual reports with charts and PDF export            |
 
 ---
 
@@ -300,8 +301,8 @@ Food · Housing · Transport · Health · Education · Leisure · Subscriptions 
 
 <div align="center">
 
-Made with ♥ by **[Juan Evangelista](https://www.linkedin.com/in/juan-evangelista/)**
+Made with ♥ by **[Juan Evangelista](https://www.linkedin.com/in/juan-evangelista-developer/)**
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Juan%20Evangelista-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/juan-evangelista/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Juan%20Evangelista-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/juan-evangelista-developer/)
 
 </div>
